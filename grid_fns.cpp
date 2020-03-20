@@ -1,4 +1,5 @@
 #include "grid_fns.h"
+#include <iostream>
 #include <fstream>
 #include <math.h>
 
@@ -208,6 +209,33 @@ vector<float>* topSideVel(const vector< vector<float> > &horizVelocityGrid, cons
 	return new vector<float> {horizComponent, vertComponent};
 }
 
+
+// void myProject(vector< vector<float> > &pressureGrid, double deltaT, int width, int height, vector<float> &rhs) {
+// 	double sigma = 0.0;
+// 	float epsilon = 0.0001;
+// 	float maxChange = 1;
+// 	float pNew = 0.0;
+// 	int index = 0;
+//
+// 	while(maxChange > epsilon) {
+// 		maxChange = 0;
+// 	    for (int i = 0; i < width; i++) {
+// 			sigma = 0.0;
+// 	        for (int j = 0; j < height; j++) {
+// 				index = i + j*width;
+// 				if (j != i) {
+// 					sigma += deltaT * pressureGrid.at(i).at(j);
+// 				}
+// 			}
+// 			// cout << i << endl;
+// 			pNew = (rhs.at(index) - sigma) / pressureGrid.at(i).at(i);
+// 			maxChange = max(maxChange, fabs(pressureGrid.at(i).at(i) - pNew));
+// 			pressureGrid.at(i).at(i) = pNew;
+// 	    }
+// 		// cout << "Max change is: " << maxChange << endl;
+// 	}
+// }
+
 // Based off of repo here: https://github.com/tunabrain/incremental-fluids.git
 void project(vector< vector<float> > &pressureGrid, double deltaT, int width, int height, vector<float> &rhs) {
 	int index = 0;
@@ -268,7 +296,7 @@ void applyPressure(const vector< vector<float> > &pressureGrid, vector< vector<f
 // Based off of repo here: https://github.com/tunabrain/incremental-fluids.git
 vector<float>* buildRHS(const vector< vector<float> > &horizVelocityGrid, const vector< vector<float> > &vertVelocityGrid, int xDim, int yDim) {
 	vector<float>* rhs = new vector<float>;
-	double term1 = 0.0, term2 = 0.0;
+	float term1 = 0.0, term2 = 0.0;
 
     for (int y = 0; y < yDim; y++) {
         for (int x = 0; x < xDim; x++) {
