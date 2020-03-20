@@ -42,13 +42,15 @@ and combine to give us a simulator.*/
 		deltaT = 1 / 30.0;
 		while (t < TIME_PER_FRAME) {
 			rhs = buildRHS(horizVelocityGrid, vertVelocityGrid, xDim, yDim);
-			project(pressureGrid, 600, deltaT, xDim, yDim, *rhs);
+			project(pressureGrid, deltaT, xDim, yDim, *rhs);
 			applyPressure(pressureGrid, horizVelocityGrid, vertVelocityGrid, deltaT, xDim, yDim);
 			advect(horizVelocityGrid, vertVelocityGrid, updatedHorizGrid, updatedVertGrid, xDim, yDim, deltaT);
+			delete rhs;
+
 			horizVelocityGrid = updatedHorizGrid;
 			vertVelocityGrid = updatedVertGrid;
+
 			t = t + deltaT;
-			delete rhs;
 		}
 	// 	save frame i
 	}

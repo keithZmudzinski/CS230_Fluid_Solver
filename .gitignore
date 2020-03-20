@@ -7,3 +7,4 @@ solver
 git_bash_rsa
 *.txt
 Fluid_Render
+*.o
