@@ -124,9 +124,6 @@ void addGravity(vector< vector<float> > &vertVelocityGrid, int xDim, int yDim, f
 // Based off of repo here: https://github.com/tunabrain/incremental-fluids.git
 void project(vector< vector<float> > &pressureGrid, double deltaT, int width, int height, vector<float> &rhs);
 
-// void myProject(vector< vector<float> > &pressureGrid, double deltaT, int width, int height, vector<float> &rhs);
-
-
 
 // Based off of repo here: https://github.com/tunabrain/incremental-fluids.git
 void applyPressure(const vector< vector<float> > &pressureGrid, vector< vector<float> > &horizVelocityGrid, vector< vector<float> > &vertVelocityGrid, double deltaT, int xDim, int yDim);
