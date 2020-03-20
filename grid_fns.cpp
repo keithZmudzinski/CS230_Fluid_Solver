@@ -279,3 +279,11 @@ vector<float>* buildRHS(const vector< vector<float> > &horizVelocityGrid, const 
     }
 	return rhs;
 }
+
+void addGravity(vector< vector<float> > &vertVelocityGrid, int xDim, int yDim, float deltaT) {
+	for(int x = 0; x < xDim; ++x) {
+		for(int y = 0; y < yDim; ++y) {
+			vertVelocityGrid.at(x).at(y) -= deltaT * 9.81;
+		}
+	}
+}

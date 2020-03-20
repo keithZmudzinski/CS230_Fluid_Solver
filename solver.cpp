@@ -41,6 +41,7 @@ and combine to give us a simulator.*/
 		saveVelocityField(horizVelocityGrid, vertVelocityGrid, xDim, yDim, fileName);
 		deltaT = 1 / 30.0;
 		while (t < TIME_PER_FRAME) {
+			addGravity(vertVelocityGrid, xDim, yDim, deltaT);
 			rhs = buildRHS(horizVelocityGrid, vertVelocityGrid, xDim, yDim);
 			project(pressureGrid, deltaT, xDim, yDim, *rhs);
 			applyPressure(pressureGrid, horizVelocityGrid, vertVelocityGrid, deltaT, xDim, yDim);

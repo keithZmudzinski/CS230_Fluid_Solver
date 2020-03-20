@@ -118,6 +118,8 @@ vector<float>* rightSideVel(const vector< vector<float> > &horizVelocityGrid, co
 */
 vector<float>* topSideVel(const vector< vector<float> > &horizVelocityGrid, const vector< vector<float> > &vertVelocityGrid, int i, int j);
 
+void addGravity(vector< vector<float> > &vertVelocityGrid, int xDim, int yDim, float deltaT);
+
 
 // Based off of repo here: https://github.com/tunabrain/incremental-fluids.git
 void project(vector< vector<float> > &pressureGrid, double deltaT, int width, int height, vector<float> &rhs);
