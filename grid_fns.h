@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 using namespace std;
 
 
@@ -213,4 +214,84 @@ vector<float>* topSideVel(const vector< vector<float> > &horizVelocityGrid, cons
 	float vertComponent = correctVVGet(vertVelocityGrid, i, j+.5);
 	return new vector<float> {horizComponent, vertComponent};
 }
+
+void project(vector< vector<float> > &pressureGrid, int limit, double timestep, int width, int height, vector<float> &r) {
+    // double scale = timestep/(fluid_density*cell_size*cell_size);
+
+    double maxDelta;
+    for (int iter = 0; iter < limit; iter++) {
+        maxDelta = 0.0;
+        for (int y = 0, index = 0; y < height; y++) {
+            for (int x = 0; x < width; x++, index++) {
+                int index = x + y*width;
+
+                double diag = 0.0, offDiag = 0.0;
+
+                /* Here we build the matrix implicitly as the five-point
+                 * stencil. Grid borders are assumed to be solid, i.e.
+                 * there is no fluid outside the simulation domain.
+                 */
+                if (x > 0) {
+                    diag    += timestep;
+                    offDiag -= timestep*pressureGrid.at(y).at(x-1);
+                }
+                if (y > 0) {
+                    diag    += timestep;
+                    offDiag -= timestep*pressureGrid.at(y-1).at(x);
+                }
+                if (x < width - 1) {
+                    diag    += timestep;
+                    offDiag -= timestep*pressureGrid.at(y).at(x+1);
+                }
+                if (y < height - 1) {
+                    diag    += timestep;
+                    offDiag -= timestep*pressureGrid.at(y+1).at(x);
+                }
+
+                double newP = (r.at(index) - offDiag)/diag;
+
+                maxDelta = max(maxDelta, fabs(pressureGrid.at(y).at(x) - newP));
+
+                pressureGrid.at(y).at(x) = newP;
+            }
+        }
+
+        if (maxDelta < 1) {
+            // printf("Exiting solver after %d iterations, maximum error is %f\n", iter, maxDelta);
+            return;
+        }
+    }
+
+    // printf("Exceeded budget of %d iterations, maximum error was %f\n", limit, maxDelta);
+}
+
+void applyPressure(const vector< vector<float> > &pressureGrid, vector< vector<float> > &horizVelocityGrid, vector< vector<float> > &vertVelocityGrid, double timestep, int height, int width) {
+    //double scale = timestep/(fluid_density*cell_size);
+
+    for (int y = 0, index = 0; y < height; y++) {
+        for (int x = 0; x < width; x++, index++) {
+            horizVelocityGrid.at(x).at(y) -= timestep*pressureGrid.at(y).at(x);
+            horizVelocityGrid.at(x + 1).at(y) += timestep*pressureGrid.at(y).at(x);
+            vertVelocityGrid.at(x).at(y) -= timestep*pressureGrid.at(y).at(x);
+            vertVelocityGrid.at(x).at(y+ 1) += timestep*pressureGrid.at(y).at(x);
+        }
+    }
+
+    for (int y = 0; y < height; y++)
+        horizVelocityGrid.at(0).at(y) = horizVelocityGrid.at(width).at(y) = 0.0;
+    for (int x = 0; x < width; x++)
+        vertVelocityGrid.at(x).at(0) = vertVelocityGrid.at(x).at(height) = 0.0;
+}
+
+vector<float>* buildRHS(const vector< vector<float> > &horizVelocityGrid, const vector< vector<float> > &vertVelocityGrid, int width, int height) {
+	vector<float>* r = new vector<float>;
+    for (int y = 0, index = 0; y < height; y++) {
+        for (int x = 0; x < width; x++, index++) {
+            r->push_back(-1*(horizVelocityGrid.at(x + 1).at(y) - horizVelocityGrid.at(x).at(y) +
+                              vertVelocityGrid.at(x).at(y + 1) - vertVelocityGrid.at(x).at(y)));
+        }
+    }
+	return r;
+}
+
 #endif
